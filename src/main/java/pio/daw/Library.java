@@ -1,6 +1,7 @@
 package pio.daw;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,26 @@ public class Library implements Controlable {
      */
     public static Library fromFile(Path path){
         Library library = new Library();
-        //TODO
+        try (java.util.stream.Stream<String> lines = java.nio.file.Files.lines(path)){
+            lines.forEach(line -> {
+                if (line == null) return;
+                String l = line.trim();
+                if (l.isEmpty()) return;
+                String[] parts = l.split(";", 2);
+                if (parts.length < 2) return;
+                String id = parts[0].trim();
+                String ev = parts[1].trim();
+                EventType e = null;
+                if (ev.equalsIgnoreCase("ENTRADA")) e = EventType.ENTRY;
+                else if (ev.equalsIgnoreCase("SALIDA")) e = EventType.EXIT;
+                if (e != null) {
+                    library.registerChange(id, e);
+                }
+            });
+        } catch (Exception ex){
+            System.err.println("Error reading file: " + ex.getMessage());
+            System.exit(1);
+        }
         return library;
     }
 
@@ -25,5 +45,72 @@ public class Library implements Controlable {
         this.users = new HashMap<>();
     }
 
-    //TODO
+    @Override
+    public void registerChange(String id, EventType e){
+        if (id == null || id.isEmpty() || e == null) return;
+        User u = this.users.get(id);
+        if (u == null){
+            u = new User(id);
+            this.users.put(id, u);
+        }
+        u.processEvent(e);
+    }
+
+    @Override
+    public List<User> getCurrentInside(){
+        List<User> res = new ArrayList<>();
+        for (User u : this.users.values()){
+            if (u.isInside()) res.add(u);
+        }
+        Collections.sort(res, (a,b) -> a.getId().compareTo(b.getId()));
+        return res;
+    }
+
+    @Override
+    public List<User> getMaxEntryUsers(){
+        List<User> res = new ArrayList<>();
+        int max = 0;
+        for (User u : this.users.values()){
+            int e = u.getEntries();
+            if (e > max){
+                max = e;
+            }
+        }
+        if (max == 0) return res;
+        for (User u : this.users.values()){
+            if (u.getEntries() == max) res.add(u);
+        }
+        Collections.sort(res, (a,b) -> a.getId().compareTo(b.getId()));
+        return res;
+    }
+
+    @Override
+    public List<User> getUserList(){
+        List<User> res = new ArrayList<>();
+        for (User u : this.users.values()){
+            if (u.getEntries() > 0) res.add(u);
+        }
+        Collections.sort(res, (a,b) -> a.getId().compareTo(b.getId()));
+        return res;
+    }
+
+    @Override
+    public void printResume(){
+        System.out.println("Usuarios actualmente dentro de la biblioteca:");
+        for (User u : getCurrentInside()){
+            System.out.println(u.getId());
+        }
+
+        System.out.println();
+        System.out.println("Número de entradas por usuario:");
+        for (User u : getUserList()){
+            System.out.println(u.getId() + " -> " + u.getEntries());
+        }
+
+        System.out.println();
+        System.out.println("Usuario(s) con más entradas:");
+        for (User u : getMaxEntryUsers()){
+            System.out.println(u.getId());
+        }
+    }
 }
