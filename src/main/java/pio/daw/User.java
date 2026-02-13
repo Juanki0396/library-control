@@ -23,13 +23,13 @@ public class User implements Localizable {
     }
 
     /**
-     * Process an event for this user. Follows rules:
+     * Register a new event for this user. Follows rules:
      * - ENTRY when already inside -> ignored
      * - ENTRY when outside -> becomes inside and entries++
      * - EXIT when outside -> ignored
      * - EXIT when inside -> becomes outside
      */
-    public void processEvent(EventType e){
+    public void registerNewEvent(EventType e){
         if (e == null) return;
         if (e == EventType.ENTRY){
             if (!this.inside){
@@ -43,5 +43,9 @@ public class User implements Localizable {
                 this.lasEvent = e;
             }
         }
+    }
+
+    public int getNEntries() {
+        return this.getEntries();
     }
 }

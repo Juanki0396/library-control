@@ -1,7 +1,7 @@
 package pio.daw;
 
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class App {
     /**
@@ -13,13 +13,11 @@ public class App {
      */
     public static Path getPathFromArgs(String[] args){
         if (args == null || args.length != 1) {
-            System.err.println("Usage: NombrePrograma <Ruta fichero>");
-            System.exit(1);
+            throw new IllegalArgumentException("Usage: NombrePrograma <Ruta fichero>");
         }
         Path p = Path.of(args[0]);
         if (!Files.exists(p) || !Files.isRegularFile(p)) {
-            System.err.println("File does not exist: " + p.toString());
-            System.exit(1);
+            throw new IllegalArgumentException("File does not exist: " + p.toString());
         }
         return p;
     }

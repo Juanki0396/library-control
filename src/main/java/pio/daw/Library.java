@@ -53,7 +53,7 @@ public class Library implements Controlable {
             u = new User(id);
             this.users.put(id, u);
         }
-        u.processEvent(e);
+        u.registerNewEvent(e);
     }
 
     @Override
@@ -96,21 +96,24 @@ public class Library implements Controlable {
 
     @Override
     public void printResume(){
-        System.out.println("Usuarios actualmente dentro de la biblioteca:");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Usuarios actualmente dentro de la biblioteca:\n");
         for (User u : getCurrentInside()){
-            System.out.println(u.getId());
+            sb.append(u.getId()).append("\n");
         }
 
-        System.out.println();
-        System.out.println("Número de entradas por usuario:");
+        sb.append("\n");
+        sb.append("Número de entradas por usuario:\n");
         for (User u : getUserList()){
-            System.out.println(u.getId() + " -> " + u.getEntries());
+            sb.append(u.getId()).append(" -> ").append(u.getEntries()).append("\n");
         }
 
-        System.out.println();
-        System.out.println("Usuario(s) con más entradas:");
+        sb.append("\n");
+        sb.append("Usuario(s) con más entradas:\n");
         for (User u : getMaxEntryUsers()){
-            System.out.println(u.getId());
+            sb.append(u.getId()).append("\n");
         }
+
+        System.out.print(sb.toString().trim());
     }
 }
