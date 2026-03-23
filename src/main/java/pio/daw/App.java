@@ -10,12 +10,19 @@ public class App {
      * @param args program args.
      * @return Path to file if exists.
      */
-    public static Path getPathFromArgs(String[] args){
-        //TODO
-        return null;
+    public static Path getPathFromArgs(String[] args) throws Exception{
+        if(args.length != 1){
+            throw new Exception("Program args are no just 1: " + String.join(" ", args));
+        }
+        Path p = Path.of(args[0]);
+        if(!p.toString().endsWith(".txt")){
+            throw new Exception("The file is not valid: " + p.toString());
+        }
+
+        return p;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         Path p = getPathFromArgs(args);
         Controlable controler = Library.fromFile(p);
         controler.printResume();

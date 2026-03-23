@@ -27,5 +27,9 @@ public class User implements Localizable {
         return this.nEntries;
     }
 
-    //TODO
+    /**
+     * Check if the object is inside something
+     * @return true if it is inside
+     */
+    public Boolean isInside() { return this.inside; }
 }
